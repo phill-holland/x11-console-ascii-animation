@@ -49,8 +49,8 @@ namespace console
 
 		void set(const char *source, int length, int row);
 
-		bool set(std::string &source) { write(source); return true; }
-		bool isfull() { return false; }
+		//bool set(std::string &source) { write(source); return true; }
+		//bool isfull() { return false; }
 
 		//std::string identifier() { return string("console"); }
 
