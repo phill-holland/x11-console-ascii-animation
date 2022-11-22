@@ -16,6 +16,10 @@ namespace console
 
 	class console //: public core::queue::interface::features::fifo::destination<string>
 	{
+	public:
+		const static int columns = 80, rows = 25;
+
+	private:
 		bool init;
 
 		Display *display;
@@ -26,7 +30,6 @@ namespace console
 		XGCValues gr_values;
 		GC graphical_context;
 
-		const static int columns = 80, rows = 25;
 		char buffer[columns * rows];
 
 		//core::threading::semaphore::token token;
@@ -44,21 +47,29 @@ namespace console
 		bool title(std::string source);
 		void write(std::string source, bool timestamp = true);
 
+		void set(const char *source, int length, int row);
+
 		bool set(std::string &source) { write(source); return true; }
 		bool isfull() { return false; }
 
 		//std::string identifier() { return string("console"); }
 
+		//bool update();
+bool refresh();	
+
 	protected:
 		bool title(const char *source);
 		void write(const char *source, int length);
 
-	protected:
-		bool refresh();
+	protected:	
+		
 		void fix(int w, int h);
 
 	public:
 		console operator<<(std::string &source) { write(source); return *this; }
+
+	protected:
+		static std::string fromTime(time_t source);
 
 	protected:
 		void makeNull();

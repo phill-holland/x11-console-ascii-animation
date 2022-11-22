@@ -2,6 +2,7 @@
 //#include "core/error/error.h"
 #include <X11/Xatom.h>
 #include <X11/Xutil.h>
+#include <cstring>
 //#include <stdio.h>
 
 void console::console::reset(int x, int y)
@@ -30,7 +31,7 @@ void console::console::reset(int x, int y)
 	fontinfo = XLoadQueryFont(display, "6x13");
 	if (fontinfo == NULL)
 	{
-		//setLastError<::console::console>(string("reset::XLoadQueryFont(6x13)"));
+		//setLastError<::console::console>(std::string("reset::XLoadQueryFont(6x13)"));
 
 		return;
 	}
@@ -42,14 +43,14 @@ void console::console::reset(int x, int y)
 
 	if (!title("Console"))
 	{
-		//setLastError<::console::console>(string("reset::title"));
+		//setLastError<::console::console>(std::string("reset::title"));
 
 		return;
 	}
 
 	if (!move(x, y))
 	{
-		//setLastError<::console::console>(string("reset::move"));
+		//setLastError<::console::console>(std::string("reset::move"));
 
 		return;
 	}
@@ -61,7 +62,7 @@ void console::console::reset(int x, int y)
 
 void console::console::clear()
 {
-	memset(buffer, 0, columns * rows);
+	std::memset(buffer, 0, columns * rows);
 }
 
 bool console::console::move(int x, int y)
@@ -80,15 +81,54 @@ void console::console::write(std::string source, bool timestamp)
 	{
 		time_t now = time(NULL);
 		std::string temp;
-		temp.concat(string::fromTime(now));
-		temp.concat(string("> "));
-		temp.concat(source);
+		temp.append(fromTime(now));
+		temp.append(std::string("> "));
+		temp.append(source);
 
-		write(temp.c_str(), temp.count());
+		write(temp.c_str(), temp.size());
 	}
-	else write(source.c_str(), source.count());
+	else write(source.c_str(), source.size());
 }
 
+void console::console::set(const char *source, int length, int row)
+{
+	int l = length;
+	if (l > columns) l = columns;
+
+	int r = row;
+	if(r > rows) r = rows;
+
+	int index = (r * columns);
+	memcpy(&buffer[index], source, l);
+}
+
+/*
+bool console::console::update()
+{
+	XWindowAttributes window_attributes;
+	int font_direction, font_ascent, font_descent;
+	XCharStruct text_structure;
+
+	XClearWindow(display, window);
+
+	int offset = 0, x = 2, y = 12;
+	for (int row = 0; row < rows; ++row)
+	{
+		char temp[columns];
+		memset(temp, 0, columns);
+		memcpy(temp, &buffer[offset], columns);
+
+		XTextExtents(fontinfo, temp, strlen(temp), &font_direction, &font_ascent, &font_descent, &text_structure);
+		XGetWindowAttributes(display, window, &window_attributes);
+		XDrawString(display, window, graphical_context, x, y, temp, strlen(temp));
+
+		y += 12;//text_structure.ascent + text_structure.descent + 2;
+		offset += columns;
+	}
+
+	return true;
+}
+*/
 bool console::console::title(const char *source)
 {
 	XStoreName(display, window, source);
@@ -141,7 +181,7 @@ bool console::console::refresh()
 		XGetWindowAttributes(display, window, &window_attributes);
 		XDrawString(display, window, graphical_context, x, y, temp, strlen(temp));
 
-		y += text_structure.ascent + text_structure.descent + 2;
+		y += 12;//text_structure.ascent + text_structure.descent + 2;
 		offset += columns;
 	}
 
@@ -156,6 +196,33 @@ void console::console::fix(int w, int h)
 	sh->min_height = sh->max_height = 100;
 	XSetWMSizeHints(display, window, sh, XA_WM_SIZE_HINTS);
 	XFree(sh);
+}
+
+std::string console::console::fromTime(time_t source)
+{
+	std::string result;
+	tm now;
+
+	localtime_r(&source, &now);
+		
+	if (now.tm_mday<10) result.append(std::string("0"));
+	result.append(std::to_string(now.tm_mday));
+	result.append(std::string("/"));
+	if ((now.tm_mon + 1) < 10) result.append(std::string("0"));
+	result.append(std::to_string(now.tm_mon + 1));
+	result.append(std::string("/"));
+	result.append(std::to_string(now.tm_year + 1900));
+	result.append(std::string(" "));
+	if (now.tm_hour<10) result.append(std::string("0"));
+	result.append(std::to_string(now.tm_hour));
+	result.append(std::string(":"));
+	if (now.tm_min<10) result.append(std::string("0"));
+	result.append(std::to_string(now.tm_min));
+	result.append(std::string(":"));
+	if (now.tm_sec<10) result.append(std::string("0"));
+	result.append(std::to_string(now.tm_sec));
+
+	return result;
 }
 
 void console::console::makeNull()

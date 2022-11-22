@@ -1,6 +1,9 @@
 #include <iostream>
 #include <vector>
 #include <math.h>
+#include <thread>
+#include "console.h"
+#include "effect.h"
 //#include "kdtree.h"
 
 
@@ -72,8 +75,8 @@ void out()
 	const char values[] = { ' ', '1', '2', '3', '4' ,'5', '6' ,'7', '8', '9' };
 	const int values_length = 10;
 
-	const int width = 50;
-	const int height = 50;
+	const int width = 80;
+	const int height = 25;
 	const int length = width * height;
 
 	const float pi = 3.1412f;// * 2.0f;
@@ -82,8 +85,8 @@ void out()
 
 	for(int i=0;i<length;++i) buffer[i] = ' ';
 
-	float x_scale = pi / (float)(width / 4.0f); // WIDTH / 4 VARIABLE
-	float y_scale = (pi*2.0f) / (float)(height / 2.0f);
+	float x_scale = pi / (float)(width);// / 4.0f); // WIDTH / 4 VARIABLE
+	float y_scale = (pi*2.0f) / (float)(height);// / 2.0f);
 
 	std::cout << x_scale << "\r\n";
 
@@ -133,8 +136,51 @@ std::cout << "\r\n";
 	delete buffer;
 }
 
+/*
+const vec2 vp = vec2(320.0, 200.0);
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+	float t = iTime * 10.0 + iMouse.x;
+	vec2 uv = fragCoord.xy / iResolution.xy;
+    vec2 p0 = (uv - 0.5) * vp;
+    vec2 hvp = vp * 0.5;
+	vec2 p1d = vec2(cos( t / 98.0),  sin( t / 178.0)) * hvp - p0;
+	vec2 p2d = vec2(sin(-t / 124.0), cos(-t / 104.0)) * hvp - p0;
+	vec2 p3d = vec2(cos(-t / 165.0), cos( t / 45.0))  * hvp - p0;
+    float sum = 0.5 + 0.5 * (
+		cos(length(p1d) / 30.0) +
+		cos(length(p2d) / 20.0) +
+		sin(length(p3d) / 25.0) * sin(p3d.x / 20.0) * sin(p3d.y / 15.0));
+    fragColor = texture(iChannel0, vec2(fract(sum), 0));
+}
+*/
 int main(int argc, char *argv[])
 {
+	//out();
+
+	console::console c;
+	effect e(console::console::columns,console::console::rows);
+
+	//console::console *c = new console::console();
+	//if(c == NULL) return 0;
+	//if(c->initalised())
+	//{
+		//cwrite(std::string("hello"));
+		while (1)
+		{
+			//c.write(std::string("hello"));
+			e.draw(c);
+			c.refresh();
+			e.next();
+
+			std::this_thread::sleep_for(std::chrono::milliseconds(10));
+		};
+	//}
+
+	//delete c;
+
+	return 0;
 	/*
     int points[][2] = { {97,23},{55,77},{34,76},{80,60},{99,04},{81,05},{05,81},{30,79},{15,80},{70,65},
                         {90,40},{40,30},{30,40},{20,60},{60,50},{20,20},{30,01},{60,40},{70,25},{44,62},
