@@ -1,7 +1,3 @@
-//#include "core/queue/interface/features.h"
-//#include "core/string/string.h"
-//#include "core/threading/thread.h"
-//#include "core/threading/semaphore.h"
 #include <string>
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,9 +8,7 @@
 
 namespace console
 {
-	//using namespace std;
-
-	class console //: public core::queue::interface::features::fifo::destination<string>
+	class console
 	{
 	public:
 		const static int columns = 80, rows = 25;
@@ -32,8 +26,6 @@ namespace console
 
 		char buffer[columns * rows];
 
-		//core::threading::semaphore::token token;
-
 	public:
 		console(int x = 0, int y = 0) { makeNull(); reset(x, y); }
 		~console() { cleanup(); }
@@ -42,20 +34,13 @@ namespace console
 		bool initalised() { return init; }
 
 		void clear();
-		bool move(int x, int y);
 
 		bool title(std::string source);
 		void write(std::string source, bool timestamp = true);
 
 		void set(const char *source, int length, int row);
-
-		//bool set(std::string &source) { write(source); return true; }
-		//bool isfull() { return false; }
-
-		//std::string identifier() { return string("console"); }
-
-		//bool update();
-bool refresh();	
+		
+		bool refresh();	
 
 	protected:
 		bool title(const char *source);

@@ -39,4 +39,4 @@ exec
 /**/debug/**/*
 /**/release/**/*
 /**/CMakeFiles/**/*
-/**/learning/clearning/build/**/*
+/**/build/**/*

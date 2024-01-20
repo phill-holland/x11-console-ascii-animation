@@ -1,9 +1,7 @@
 #include "console.h"
-//#include "core/error/error.h"
 #include <X11/Xatom.h>
 #include <X11/Xutil.h>
 #include <cstring>
-//#include <stdio.h>
 
 void console::console::reset(int x, int y)
 {
@@ -29,31 +27,14 @@ void console::console::reset(int x, int y)
 	fix(width, height);
 
 	fontinfo = XLoadQueryFont(display, "6x13");
-	if (fontinfo == NULL)
-	{
-		//setLastError<::console::console>(std::string("reset::XLoadQueryFont(6x13)"));
-
-		return;
-	}
+	if (fontinfo == NULL) return;
 
 	gr_values.font = fontinfo->fid;
 	gr_values.foreground = XWhitePixel(display, 0);
 	graphical_context = XCreateGC(display, window, GCFont + GCForeground, &gr_values);
 	XMapWindow(display, window);
 
-	if (!title("Console"))
-	{
-		//setLastError<::console::console>(std::string("reset::title"));
-
-		return;
-	}
-
-	if (!move(x, y))
-	{
-		//setLastError<::console::console>(std::string("reset::move"));
-
-		return;
-	}
+	if (!title("Console")) return;
 
 	clear();
 
@@ -63,11 +44,6 @@ void console::console::reset(int x, int y)
 void console::console::clear()
 {
 	std::memset(buffer, 0, columns * rows);
-}
-
-bool console::console::move(int x, int y)
-{
-	return true;
 }
 
 bool console::console::title(std::string source)
@@ -102,33 +78,6 @@ void console::console::set(const char *source, int length, int row)
 	memcpy(&buffer[index], source, l);
 }
 
-/*
-bool console::console::update()
-{
-	XWindowAttributes window_attributes;
-	int font_direction, font_ascent, font_descent;
-	XCharStruct text_structure;
-
-	XClearWindow(display, window);
-
-	int offset = 0, x = 2, y = 12;
-	for (int row = 0; row < rows; ++row)
-	{
-		char temp[columns];
-		memset(temp, 0, columns);
-		memcpy(temp, &buffer[offset], columns);
-
-		XTextExtents(fontinfo, temp, strlen(temp), &font_direction, &font_ascent, &font_descent, &text_structure);
-		XGetWindowAttributes(display, window, &window_attributes);
-		XDrawString(display, window, graphical_context, x, y, temp, strlen(temp));
-
-		y += 12;//text_structure.ascent + text_structure.descent + 2;
-		offset += columns;
-	}
-
-	return true;
-}
-*/
 bool console::console::title(const char *source)
 {
 	XStoreName(display, window, source);
@@ -138,8 +87,6 @@ bool console::console::title(const char *source)
 
 void console::console::write(const char *source, int length)
 {
-	//core::threading::semaphore lock(token);
-
 	int previous = (rows - 2)  * columns;
 	int current = (rows - 1) * columns;
 
